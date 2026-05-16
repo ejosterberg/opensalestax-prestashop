@@ -1,0 +1,33 @@
+# Composer
+/vendor/
+composer.phar
+
+# PHPUnit
+/.phpunit.cache/
+/.phpunit.result.cache
+coverage.xml
+.phpunit.result.cache
+
+# PHPStan
+/.phpstan.cache/
+
+# PHP-CS-Fixer
+/.php-cs-fixer.cache
+
+# Build artifacts
+/build/
+/dist/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
+
+# Captain session locks
+.claude-session-lock.json
+
+# Local env override (never commit secrets)
+.env.local

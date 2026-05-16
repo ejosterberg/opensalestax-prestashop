@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<module>
+  <name>opensalestax</name>
+  <displayName><![CDATA[OpenSalesTax]]></displayName>
+  <version><![CDATA[0.1.0]]></version>
+  <description><![CDATA[Destination-based US sales tax via a merchant-self-hosted OpenSalesTax engine. Calculation only; the merchant remits.]]></description>
+  <author><![CDATA[Eric Osterberg]]></author>
+  <tab><![CDATA[billing_invoicing]]></tab>
+  <confirmUninstall><![CDATA[Uninstall OpenSalesTax? PrestaShop will fall back to its built-in tax tables on next cart recalc.]]></confirmUninstall>
+  <is_configurable>1</is_configurable>
+  <need_instance>0</need_instance>
+  <limited_countries></limited_countries>
+</module>
