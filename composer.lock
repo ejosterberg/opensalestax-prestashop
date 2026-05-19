@@ -4,20 +4,20 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "d355a94c88564343d7aa7c1533d0f0ca",
+    "content-hash": "9047187f9ade694585cb3c62d806dc0d",
     "packages": [
         {
             "name": "ejosterberg/opensalestax",
-            "version": "v0.1.1",
+            "version": "v0.2.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/ejosterberg/opensalestax-php.git",
-                "reference": "0262605556f8d14cc48a91d7e07c7a172a8e5282"
+                "reference": "f91cea3548c5f116df0007fe05bd86efb358788f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/ejosterberg/opensalestax-php/zipball/0262605556f8d14cc48a91d7e07c7a172a8e5282",
-                "reference": "0262605556f8d14cc48a91d7e07c7a172a8e5282",
+                "url": "https://api.github.com/repos/ejosterberg/opensalestax-php/zipball/f91cea3548c5f116df0007fe05bd86efb358788f",
+                "reference": "f91cea3548c5f116df0007fe05bd86efb358788f",
                 "shasum": ""
             },
             "require": {
@@ -57,9 +57,9 @@
             ],
             "support": {
                 "issues": "https://github.com/ejosterberg/opensalestax-php/issues",
-                "source": "https://github.com/ejosterberg/opensalestax-php/tree/v0.1.1"
+                "source": "https://github.com/ejosterberg/opensalestax-php/tree/v0.2.0"
             },
-            "time": "2026-05-15T16:06:47+00:00"
+            "time": "2026-05-19T04:15:15+00:00"
         },
         {
             "name": "guzzlehttp/guzzle",
