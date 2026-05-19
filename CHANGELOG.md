@@ -4,6 +4,38 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html). Pre-release identifiers (`-alpha.N`, `-rc.N`) signal that the listed version is not yet stable.
 
+## [0.1.0-alpha.3] - 2026-05-19
+
+### Added
+
+- **CP-9 first-class shipping support.** The `TaxCalculator` now accepts
+  an optional `?float $shippingCost` argument (the glue layer passes
+  `Cart::getOrderShippingCost(null, false)`) and sends it to the
+  OpenSalesTax engine as a top-level `shipping` field (engine v0.59.0+
+  via the `shipping_first_class` capability flag, exposed in
+  `ejosterberg/opensalestax` v0.3.0). The engine applies per-state
+  shipping-taxability rules internally (MN "tax-if-items-taxable", MO/VA
+  "separately-stated", MD "shipping-vs-handling"). The returned
+  `CalculateResponse::$shipping->taxAmount` flows back to the caller via
+  the existing response object.
+- `Shipping` value object propagated through `CartPayloadBuilder`,
+  `TaxCalculator`, and `RateCache` cache-key signature (so a cart with
+  a different shipping cost gets a fresh cache key).
+
+### Changed
+
+- **Bumps `ejosterberg/opensalestax` constraint from `^0.2.0` to
+  `^0.3.0`.** Picks up the new third arg on `Client::calculate(addr,
+  lines, shipping?)` plus the `CalculateResponse::$shipping` and
+  `$coverageWarning` response fields. Backward compatible — callers
+  that don't pass `$shippingCost` behave identically to v0.1.0-alpha.2.
+
+### Notes
+
+- Out-of-nexus orders get 0 shipping tax (same gate as item tax).
+- Engine v0.59.0+ required for shipping to be honored. Older engines
+  silently ignore the field; the response's `shipping` field is `null`.
+
 ## [0.1.0-alpha.2] - 2026-05-19
 
 ### Changed

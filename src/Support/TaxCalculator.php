@@ -9,6 +9,7 @@ namespace OpenSalesTax\PrestaShop\Support;
 use OpenSalesTax\Client;
 use OpenSalesTax\PrestaShop\Exceptions\PrestaShopOpenSalesTaxException;
 use OpenSalesTax\Responses\CalculateResponse;
+use OpenSalesTax\Shipping;
 use Throwable;
 
 /**
@@ -58,22 +59,27 @@ final class TaxCalculator
      * @param array<string, mixed>             $shippingAddress Flat shape with `country_iso`,
      *                                                          `postcode`, optionally `state_iso`.
      * @param string                            $currency        Cart currency ISO code.
+     * @param float|null                        $shippingCost   Optional pre-tax shipping cost
+     *                                                          (typically `Cart::getOrderShippingCost(null, false)`).
+     *                                                          When > 0, sent to the engine as a first-class
+     *                                                          `shipping` field (engine v0.59.0+).
      */
     public function calculate(
         array $products,
         array $shippingAddress,
         string $currency,
+        ?float $shippingCost = null,
     ): ?CalculateResponse {
-        $prepared = $this->prepare($products, $shippingAddress, $currency);
+        $prepared = $this->prepare($products, $shippingAddress, $currency, $shippingCost);
         if ($prepared === null) {
             return null;
         }
-        [$client, $address, $lineItems, $signature] = $prepared;
+        [$client, $address, $lineItems, $signature, $shipping] = $prepared;
 
         try {
             return $this->cache->remember(
                 $address->zip5,
-                fn (): CalculateResponse => $this->callEngine($client, $address->zip5, $lineItems),
+                fn (): CalculateResponse => $this->callEngine($client, $address->zip5, $lineItems, $shipping),
                 $signature,
             );
         } catch (Throwable $e) {
@@ -86,12 +92,13 @@ final class TaxCalculator
      *
      * @param array<int, array<string, mixed>> $products
      * @param array<string, mixed>             $shippingAddress
-     * @return array{0: Client, 1: \OpenSalesTax\Address, 2: \OpenSalesTax\LineItem[], 3: string}|null
+     * @return array{0: Client, 1: \OpenSalesTax\Address, 2: \OpenSalesTax\LineItem[], 3: string, 4: Shipping|null}|null
      */
     private function prepare(
         array $products,
         array $shippingAddress,
         string $currency,
+        ?float $shippingCost,
     ): ?array {
         if (!$this->config->isActive()) {
             return null;
@@ -103,27 +110,28 @@ final class TaxCalculator
             return null;
         }
 
-        $payload = $this->payloadBuilder->build($products, $shippingAddress, $currency);
+        $payload = $this->payloadBuilder->build($products, $shippingAddress, $currency, $shippingCost);
         $client  = $payload === null ? null : $this->clientFactory->make($this->config);
         if ($payload === null || $client === null) {
             return null;
         }
-        [$address, $lineItems, $signature] = $payload;
-        return [$client, $address, $lineItems, $signature];
+        [$address, $lineItems, $signature, $shipping] = $payload;
+        return [$client, $address, $lineItems, $signature, $shipping];
     }
 
     /**
      * @param \OpenSalesTax\LineItem[] $lineItems
      */
-    private function callEngine(Client $client, string $zip5, array $lineItems): CalculateResponse
+    private function callEngine(Client $client, string $zip5, array $lineItems, ?Shipping $shipping): CalculateResponse
     {
         $start = microtime(true);
-        $response = $client->calculate(new \OpenSalesTax\Address($zip5), $lineItems);
+        $response = $client->calculate(new \OpenSalesTax\Address($zip5), $lineItems, $shipping);
 
         $this->logger->info('opensalestax: engine /v1/calculate ok', [
             'zip5'       => $zip5,
             'rtt_ms'     => (int) round((microtime(true) - $start) * 1000),
             'line_count' => count($response->lines),
+            'shipping'   => $shipping !== null ? 1 : 0,
         ]);
         return $response;
     }
